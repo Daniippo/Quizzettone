@@ -47,56 +47,49 @@
       transition: all 0.8s cubic-bezier(0.6, -0.28, 0.735, 0.045);
       pointer-events: none;
     }
-
     .exploding-poop {
       position: fixed; z-index: 9999; font-size: 30px;
       animation: poop-fade 0.6s forwards;
       pointer-events: none;
     }
-
     @keyframes poop-fade {
       0% { transform: scale(0.5); opacity: 0; }
       20% { transform: scale(1.2); opacity: 1; }
       100% { transform: translateY(20px) scale(1); opacity: 0; }
     }
 
-    /* LAYOUT MENU ADATTIVO */
+    /* MENU A GRIGLIA COMPATTO */
     #menu-screen { 
-      padding: 60px 20px; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      text-align: center; 
-      max-width: 1000px;
+      padding: 40px 20px; 
+      max-width: 1200px;
       margin: 0 auto;
+      width: 100%;
     }
-    .logo-area h1 { font-family: 'Cinzel', serif; color: var(--c-oro); font-size: 2.5rem; margin-bottom: 10px; }
+    .logo-area { text-align: center; margin-bottom: 30px; }
+    .logo-area h1 { font-family: 'Cinzel', serif; color: var(--c-oro); font-size: 2rem; margin: 0; }
     
     #sfide-list { 
       display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-      gap: 20px; 
-      width: 100%; 
-      margin-top: 40px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+      gap: 15px; 
+      width: 100%;
     }
     
     .sfida-card { 
       background: white; 
-      padding: 25px; 
-      border-radius: 20px; 
-      box-shadow: 0 8px 20px rgba(0,0,0,0.06); 
+      padding: 15px; 
+      border-radius: 12px; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
       cursor: pointer; 
-      border: 2px solid transparent; 
-      border-top: 8px solid var(--c-oro);
-      transition: all 0.3s ease; 
+      border-top: 5px solid var(--c-oro);
+      transition: transform 0.2s;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      text-align: left;
+      height: 140px; /* Altezza fissa per uniformità */
     }
-    .sfida-card:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.1); }
-    .sfida-card h2 { margin: 0 0 10px 0; font-size: 1.4rem; color: var(--c-testo); }
-    .sfida-card p { margin: 0; font-size: 0.95rem; color: #666; line-height: 1.4; }
+    .sfida-card:hover { transform: translateY(-3px); }
+    .sfida-card h2 { margin: 0 0 8px 0; font-size: 1.1rem; color: var(--c-testo); }
+    .sfida-card p { margin: 0; font-size: 0.85rem; color: #666; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
 
     /* LAYOUT GIOCO */
     #game-screen { display: none; flex-grow: 1; }
@@ -126,7 +119,7 @@
     #modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 3000; }
     #modal-content { background: white; padding: 25px; border-radius: 20px; width: 92%; max-width: 500px; text-align: center; max-height: 85vh; overflow-y: auto; }
     
-    .btn-ans { background: var(--c-oro); color: white; border: none; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: bold; margin: 10px auto; width: 100%; display: block; font-size: 1rem; }
+    .btn-ans { background: var(--c-oro); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: bold; margin: 10px auto; width: 100%; display: block; font-size: 1rem; }
 
     #report-area { display: none; padding: 20px; background: white; text-align: center; }
     .report-table-container { overflow-x: auto; margin-top: 20px; }
@@ -151,10 +144,11 @@
   <div id="menu-screen">
     <div class="logo-area">
       <h1>Didattica Hub</h1>
-      <p>Seleziona una sfida e inizia il percorso!</p>
     </div>
     <div id="sfide-list">Caricamento sfide...</div>
-    <button class="btn-ans no-print" style="background:#7f8c8d; max-width:200px; margin-top:40px;" onclick="resetTutto()">RESET GLOBALE</button>
+    <div style="text-align: center;">
+      <button class="btn-ans no-print" style="background:#7f8c8d; max-width:180px; margin-top:30px;" onclick="resetTutto()">RESET GLOBALE</button>
+    </div>
   </div>
 
   <div id="game-screen">
@@ -192,8 +186,8 @@
       </table>
     </div>
     <div class="no-print">
-      <button class="btn-ans" style="display:inline-block; width:auto; padding: 12px 30px; margin-top: 20px;" onclick="window.print()">🖨️ STAMPA REPORT</button>
-      <button class="btn-ans" style="display:inline-block; width:auto; background:#7f8c8d; padding: 12px 30px;" onclick="tornaAlMenu()">🏠 HOME</button>
+      <button class="btn-ans" style="display:inline-block; width:auto; padding: 10px 30px; margin-top: 20px;" onclick="window.print()">🖨️ STAMPA REPORT</button>
+      <button class="btn-ans" style="display:inline-block; width:auto; background:#7f8c8d; padding: 10px 30px;" onclick="tornaAlMenu()">🏠 HOME</button>
     </div>
   </div>
 
@@ -229,7 +223,7 @@
     function renderMenu() {
       document.getElementById('report-area').style.display = 'none';
       document.getElementById('game-screen').style.display = 'none';
-      document.getElementById('menu-screen').style.display = 'flex';
+      document.getElementById('menu-screen').style.display = 'block';
       const list = document.getElementById('sfide-list');
       list.innerHTML = '';
       
@@ -239,11 +233,8 @@
         card.style.borderTopColor = s.colore;
         card.onclick = () => caricaSfida(s);
         card.innerHTML = `
-          <div>
-            <h2 style="color:${s.colore}">${s.titolo}</h2>
-            <p>${s.desc}</p>
-          </div>
-          <div style="margin-top:20px; font-weight:bold; color:${s.colore}; font-size:0.8rem;">CLICCA PER INIZIARE ➔</div>
+          <h2 style="color:${s.colore}">${s.titolo}</h2>
+          <p>${s.desc}</p>
         `;
         list.appendChild(card);
       });
@@ -264,6 +255,7 @@
         const csv = await resp.text();
         const rows = parseCSV(csv);
         TOTAL_LEVELS = parseInt(rows[1][1]) || 0;
+        
         adventData = rows.slice(4, 4 + TOTAL_LEVELS).map((v, i) => ({
           day: i + 1, 
           question: v[1],      
@@ -272,6 +264,7 @@
           options: [v[3], v[4], v[5], v[6], v[7]].filter(o => o && o !== ""),
           spiegazione: v[12]   
         }));
+        
         render();
       } catch (e) { alert("Errore caricamento sfida."); tornaAlMenu(); }
     }
