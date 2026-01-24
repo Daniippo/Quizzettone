@@ -41,7 +41,7 @@
       font-weight: bold; color: var(--c-oro); border: 2px solid var(--c-oro);
     }
 
-    /* ANIMAZIONI */
+    /* ANIMAZIONI RISPOSTE */
     .flying-star {
       position: fixed; z-index: 9999; font-size: 24px;
       transition: all 0.8s cubic-bezier(0.6, -0.28, 0.735, 0.045);
@@ -58,7 +58,7 @@
       100% { transform: translateY(20px) scale(1); opacity: 0; }
     }
 
-    /* MENU A GRIGLIA COMPATTO */
+    /* === MODIFICA: LAYOUT MENU A GRIGLIA === */
     #menu-screen { 
       padding: 40px 20px; 
       max-width: 1200px;
@@ -69,26 +69,28 @@
     .logo-area h1 { font-family: 'Cinzel', serif; color: var(--c-oro); font-size: 2rem; margin: 0; }
     
     #sfide-list { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
-      gap: 15px; 
-      width: 100%;
+      display: grid !important; 
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important; 
+      gap: 20px !important; 
+      width: 100% !important;
+      margin-top: 30px;
     }
     
     .sfida-card { 
       background: white; 
-      padding: 15px; 
+      padding: 18px; 
       border-radius: 12px; 
       box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
       cursor: pointer; 
-      border-top: 5px solid var(--c-oro);
-      transition: transform 0.2s;
+      border-top: 6px solid var(--c-oro);
+      transition: transform 0.2s, box-shadow 0.2s;
       display: flex;
       flex-direction: column;
-      height: 140px; /* Altezza fissa per uniformità */
+      height: 160px; /* Altezza uniforme */
+      text-align: left;
     }
-    .sfida-card:hover { transform: translateY(-3px); }
-    .sfida-card h2 { margin: 0 0 8px 0; font-size: 1.1rem; color: var(--c-testo); }
+    .sfida-card:hover { transform: translateY(-4px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+    .sfida-card h2 { margin: 0 0 10px 0; font-size: 1.15rem; color: var(--c-testo); line-height: 1.2; }
     .sfida-card p { margin: 0; font-size: 0.85rem; color: #666; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
 
     /* LAYOUT GIOCO */
@@ -210,6 +212,7 @@
     let TOTAL_LEVELS = 0;
     let stars = 0;
 
+    /* --- INIZIALIZZAZIONE --- */
     async function init() {
       try {
         const resp = await fetch(URL_INDICE_SFIDE);
@@ -220,6 +223,7 @@
       } catch (e) { document.getElementById('sfide-list').innerText = "Errore indice."; }
     }
 
+    /* === MODIFICA: FUNZIONE RENDER MENU COMPATTA === */
     function renderMenu() {
       document.getElementById('report-area').style.display = 'none';
       document.getElementById('game-screen').style.display = 'none';
@@ -241,6 +245,7 @@
       document.getElementById('stars-bar').style.display = 'none';
     }
 
+    /* --- CARICAMENTO SFIDA --- */
     async function caricaSfida(sfida) {
       currentSfida = sfida;
       document.documentElement.style.setProperty('--c-oro', sfida.colore);
@@ -256,19 +261,21 @@
         const rows = parseCSV(csv);
         TOTAL_LEVELS = parseInt(rows[1][1]) || 0;
         
+        // --- MAPPATURA COLONNE ---
         adventData = rows.slice(4, 4 + TOTAL_LEVELS).map((v, i) => ({
           day: i + 1, 
-          question: v[1],      
-          checkAnswer: v[2],   
-          answerOK: v[10],     
+          question: v[1],      // Colonna B
+          checkAnswer: v[2],   // Colonna C (per controllo logico)
+          answerOK: v[10],     // Colonna K (per Report)
           options: [v[3], v[4], v[5], v[6], v[7]].filter(o => o && o !== ""),
-          spiegazione: v[12]   
+          spiegazione: v[12]   // Colonna M
         }));
         
         render();
       } catch (e) { alert("Errore caricamento sfida."); tornaAlMenu(); }
     }
 
+    /* --- RENDERING GIOCO --- */
     function render() {
       const container = document.getElementById('nodes-container');
       container.innerHTML = '';
@@ -304,6 +311,7 @@
       }, 100);
     }
 
+    /* --- GESTIONE QUIZ --- */
     function openQuiz(day) {
       const d = adventData[day-1];
       const cont = document.getElementById('quiz-container');
@@ -319,6 +327,26 @@
       if (window.MathJax) MathJax.typeset();
     }
 
+    function check(day, val, btn) {
+      const d = adventData[day-1];
+      const sId = currentSfida.id;
+      let att = (parseInt(localStorage.getItem(`tent_${sId}_${day}`)) || 0) + 1;
+      localStorage.setItem(`tent_${sId}_${day}`, att);
+
+      if (val.trim().toLowerCase() === d.checkAnswer.toLowerCase()) {
+        document.getElementById('snd-ok').play().catch(()=>{});
+        localStorage.setItem(`day_${sId}_${day}`, 'correct');
+        animateCorrectStar(btn);
+        document.getElementById('quiz-container').innerHTML = `<h2>✨ Corretto!</h2><p>${d.spiegazione || ''}</p><button class="btn-ans" onclick="chiudiEProsegui()">PROSEGUI</button>`;
+        if (window.MathJax) MathJax.typeset();
+      } else {
+        document.getElementById('snd-no').play().catch(()=>{});
+        animatePoop(btn);
+        document.getElementById('feedback-msg').innerText = "❌ Errato! Tentativo n. " + att;
+      }
+    }
+
+    /* --- ANIMAZIONI --- */
     function animateCorrectStar(btn) {
       const star = document.createElement('div');
       star.className = 'flying-star';
@@ -355,27 +383,9 @@
       localStorage.setItem(`stars_${currentSfida.id}`, stars);
     }
 
-    function check(day, val, btn) {
-      const d = adventData[day-1];
-      const sId = currentSfida.id;
-      let att = (parseInt(localStorage.getItem(`tent_${sId}_${day}`)) || 0) + 1;
-      localStorage.setItem(`tent_${sId}_${day}`, att);
-
-      if (val.trim().toLowerCase() === d.checkAnswer.toLowerCase()) {
-        document.getElementById('snd-ok').play().catch(()=>{});
-        localStorage.setItem(`day_${sId}_${day}`, 'correct');
-        animateCorrectStar(btn);
-        document.getElementById('quiz-container').innerHTML = `<h2>✨ Corretto!</h2><p>${d.spiegazione || ''}</p><button class="btn-ans" onclick="chiudiEProsegui()">PROSEGUI</button>`;
-        if (window.MathJax) MathJax.typeset();
-      } else {
-        document.getElementById('snd-no').play().catch(()=>{});
-        animatePoop(btn);
-        document.getElementById('feedback-msg').innerText = "❌ Errato! Tentativo n. " + att;
-      }
-    }
-
     function chiudiEProsegui() { document.getElementById('modal-overlay').style.display = 'none'; render(); }
     
+    /* --- REPORT FINALE --- */
     function showReport() {
       document.getElementById('game-screen').style.display = 'none';
       document.getElementById('report-area').style.display = 'block';
@@ -395,6 +405,7 @@
       if (window.MathJax) MathJax.typeset();
     }
 
+    /* --- UTILITY --- */
     function parseCSV(csv) {
       return csv.split(/\r?\n/).filter(r => r !== "").map(row => {
         const out = []; let cur = ''; let inQ = false;
