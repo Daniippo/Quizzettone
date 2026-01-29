@@ -239,6 +239,65 @@
 
 }
 
+/* ====== POPUP QUIZ RESPONSIVE ====== */
+
+/* base: già ok su desktop */
+#modal-content{
+  width: min(92vw, 520px);
+  max-height: 88vh;
+}
+
+/* testo domanda (lo aggiungiamo con una classe, vedi punto 2) */
+.quiz-question{
+  font-weight: 700;
+  line-height: 1.25;
+  font-size: 1.05rem;
+  margin: 10px 0 8px 0;
+  overflow-wrap: anywhere;  /* evita overflow con formule/testi lunghi */
+}
+
+/* MOBILE: meno padding + font più “fit” */
+@media (max-width: 480px){
+  #modal-content{
+    width: 94vw;
+    padding: 14px;          /* prima era 25px */
+    border-radius: 16px;
+    max-height: 92vh;
+  }
+
+  #modal-content h3{
+    font-size: 1rem;
+    margin: 6px 0 8px 0;
+  }
+
+  .quiz-question{
+    font-size: 0.98rem;     /* leggermente più piccola */
+    line-height: 1.2;
+  }
+
+  .btn-ans{
+    padding: 11px;
+    font-size: 0.95rem;
+    margin: 8px auto;
+  }
+}
+
+/* DESKTOP/LIM: un filo più grande e arioso */
+@media (min-width: 900px){
+  #modal-content{
+    padding: 28px;
+    max-height: 80vh;
+  }
+
+  .quiz-question{
+    font-size: 1.15rem;
+    line-height: 1.3;
+  }
+
+  .btn-ans{
+    font-size: 1.05rem;
+  }
+}
 
 
 
@@ -505,7 +564,7 @@
       const cont = document.getElementById('quiz-container');
       document.getElementById('feedback-msg').innerText = "";
 
-      let h = '<h3>Domanda ' + day + '</h3><p style="font-weight:700;">' + d.question + '</p>';
+      let h = '<h3>Domanda ' + day + '</h3><p class="quiz-question">' + d.question + '</p>';
 
       if (d.options.length > 0) {
         d.options.forEach((o, i) => {
